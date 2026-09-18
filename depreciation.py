@@ -1,4 +1,5 @@
 import csv
+from datetime import date, datetime
 
 def parse_currency(value):
     return float(str(value).replace(",", "").replace("$", ""))
@@ -41,6 +42,24 @@ def calculate_schedule(asset):
 
 
     return schedule
+
+def get_book_value_as_of(asset, as_of_date=None):
+    if as_of_date is None:
+        as_of_date = date.today()
+
+    cost = parse_currency(asset["cost"])
+    salvage_value = parse_currency(asset["salvage_value"])
+    useful_life_years = float(asset["useful_life_years"])
+    purchase_date = datetime.strptime(asset["purchase_date"], "%Y-%m-%d").date()
+
+    days_elapsed = (as_of_date - purchase_date).days
+    years_elapsed = min(days_elapsed / 365.25, useful_life_years)
+
+    annual_depreciation = (cost - salvage_value) / useful_life_years
+    accumulated = annual_depreciation * years_elapsed
+    book_value = max(cost - accumulated, salvage_value)
+
+    return round(book_value, 2)
 
 if __name__ == "__main__":
     assets = load_assets("data/asset_register.csv")

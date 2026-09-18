@@ -1,4 +1,4 @@
-from depreciation import load_assets, parse_currency
+from depreciation import load_assets, get_book_value_as_of
 
 def reconcile(register_assets, count_assets):
     register_by_id = {asset["asset_id"]: asset for asset in register_assets}
@@ -16,7 +16,7 @@ def reconcile(register_assets, count_assets):
         ghost_assets.append({
             "asset_id": asset_id,
             "description": asset["description"],
-            "cost_at_risk": parse_currency(asset["cost"]),
+            "book_value_at_risk": get_book_value_as_of(asset),
         })
 
     unrecorded_assets = []
